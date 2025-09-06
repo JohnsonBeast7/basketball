@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: php_app
+    volumes:
+      - ./app:/var/www/html
+    ports:
+      - "8081:80"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - meu_projeto_network
+
+  mariadb:
+    image: mariadb:10.7
+    container_name: mariadb_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: meu_banco
+      MYSQL_USER: meu_usuario
+      MYSQL_PASSWORD: minha_senha
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - meu_projeto_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadminson
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: meu_usuario
+      PMA_PASSWORD: minha_senha
+    depends_on:
+      - mariadb
+    networks:
+      - meu_projeto_network
+
+networks:
+  meu_projeto_network:
+    driver: bridge
