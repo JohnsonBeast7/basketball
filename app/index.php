@@ -11,7 +11,7 @@ class Player {
         $this->name = $name;
         $this->age = $age;
         $this->points = $points;
-        $this->contract = "Active";
+        $this->contract = "Unknown";
 
     }
 
